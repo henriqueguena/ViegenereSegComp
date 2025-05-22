@@ -2,7 +2,8 @@ import re
 import unicodedata
 
 alfabeto = "abcdefghijklmnopqrstuvwxyz"
-chave = "chave"  # Pode ser qualquer chave
+chave_pt = "chave"
+chave_en = "keyst"
 plaintext_portugues = """
 A segurança computacional é uma disciplina essencial dentro da tecnologia da informação, cuja função principal é proteger sistemas, redes, programas e dados contra ameaças internas e externas que possam comprometer sua integridade, confidencialidade e disponibilidade. Em um mundo cada vez mais digitalizado, onde transações bancárias, comunicações pessoais, registros médicos, operações empresariais e decisões governamentais dependem fortemente de sistemas informatizados, a segurança computacional tornou-se um pilar indispensável para o funcionamento seguro e eficiente da sociedade moderna.
 
@@ -38,13 +39,6 @@ Another important aspect of computational security is compliance with rules and 
 
 Therefore, computational security is a dynamic and strategic field that requires constant updates in the face of the rapid evolution of digital threats. Professionals in this area must combine technical knowledge with analytical skills and critical thinking to anticipate risks, implement effective solutions, and ensure that digital infrastructure continues to operate securely. In a scenario where information is one of the most valuable assets, protecting data means protecting people, businesses, and institutions.
 """
-# === Escolher idioma ===
-def escolher_idioma():
-    if idioma == 'en':
-        return normalizar(plaintext_ingles), frequencia_ingles
-    return normalizar(plaintext_portugues), frequencia_portugues
-
-# === Normalização ===
 def normalizar(texto):
     texto_sem_acentos = ''.join(
         c for c in unicodedata.normalize('NFD', texto)
@@ -52,11 +46,9 @@ def normalizar(texto):
     )
     return texto_sem_acentos.lower()
 
-# === Limpar texto ===
 def limpar_texto(texto):
     return re.sub(r'[^a-z]', '', texto)
 
-# === Frequência de letras ===
 def calcular_frequencia_letras(texto):
     contador = [0] * 26
     total = 0
@@ -73,7 +65,6 @@ def exibir_frequencias_linha(frequencias, titulo="Frequências"):
     print("-" * 130)
     print(' '.join(f"{freq:5.2f}" for freq in frequencias))
 
-# === Cifrar texto ===
 def cifrar_vigenere(texto, chave):
     contador = 0
     cifra = ''
@@ -85,7 +76,6 @@ def cifrar_vigenere(texto, chave):
             cifra += i
     return cifra
 
-# === Trincas ===
 def encontrar_trincas(cifra_limpa):
     matriz_trincas = []
     for n in range(len(cifra_limpa) - 2):
@@ -106,7 +96,6 @@ def encontrar_trincas(cifra_limpa):
         resultado.append([trinca, freq, menor_espaco])
     return resultado
 
-# === Fatores ===
 def fatores_menores_que_26(n):
     return [i for i in range(2, 26) if n % i == 0]
 
@@ -121,7 +110,6 @@ def obter_fator_mais_frequente(resultado):
     fatores_ordenados = sorted(frequencia_fatores.items(), key=lambda x: x[1], reverse=True)
     return fatores_ordenados
 
-# === Agrupar por posição ===
 def separar_texto_por_posicao(texto, tamanho_chave):
     grupos = [[] for _ in range(tamanho_chave)]
     for i, c in enumerate(texto):
@@ -129,11 +117,9 @@ def separar_texto_por_posicao(texto, tamanho_chave):
             grupos[i % tamanho_chave].append(c)
     return [''.join(g) for g in grupos]
 
-# === Deslocar frequência ===
 def deslocar_frequencias(freq, deslocamento):
     return freq[deslocamento:] + freq[:deslocamento]
 
-# === Decifrar ===
 def decifrar_vigenere(texto_cifrado, chave):
     texto_decifrado = ''
     contador = 0
@@ -146,61 +132,61 @@ def decifrar_vigenere(texto_cifrado, chave):
             texto_decifrado += c
     return texto_decifrado
 
-# === Execução ===
-idioma = input("Escolha o idioma do texto (pt/en): ").strip().lower()
-texto, freq_esperada = escolher_idioma()
-cifra = cifrar_vigenere(texto, chave)
-cifra_limpa = limpar_texto(cifra)
-resultado = encontrar_trincas(cifra_limpa)
-fatores = obter_fator_mais_frequente(resultado)
+def processar_texto(texto, chave, freq_esperada, idioma):
+    print(f"\n=== PROCESSANDO TEXTO EM {idioma.upper()} ===")
+    texto_norm = normalizar(texto)
+    cifra = cifrar_vigenere(texto_norm, chave)
+    print(f'texto cifrado:{cifra}')
+    cifra_limpa = limpar_texto(cifra)
+    resultado = encontrar_trincas(cifra_limpa)
+    fatores = obter_fator_mais_frequente(resultado)
 
-print("\nTop 5 fatores mais frequentes:")
-for idx, (fator, freq) in enumerate(fatores[:5]):
-    print(f"{idx + 1}. Fator: {fator} | Frequência: {freq}")
+    print("\nTop 5 fatores mais frequentes:")
+    for idx, (fator, freq) in enumerate(fatores[:5]):
+        print(f"{idx + 1}. Fator: {fator} | Frequência: {freq}")
 
-escolha = int(input("\nEscolha 1, 2, 3, 4 ou 5: "))
-if 1 <= escolha <= 5:
+    escolha = int(input("\nEscolha 1, 2, 3, 4 ou 5: "))
     fator_escolhido = fatores[escolha - 1][0]
-else:
-    print("Escolha inválida.")
-    exit()
 
-grupos = separar_texto_por_posicao(cifra_limpa, fator_escolhido)
-chave_descoberta = ['?'] * fator_escolhido
+    grupos = separar_texto_por_posicao(cifra_limpa, fator_escolhido)
+    chave_descoberta = ['?'] * fator_escolhido
 
-for posicao in range(fator_escolhido):
-    grupo = grupos[posicao]
-    if not grupo:
-        continue
-
-    print(f"\nPOSIÇÃO {posicao + 1} DA CHAVE")
-    freq_posicao = calcular_frequencia_letras(grupo)
-    exibir_frequencias_linha(freq_posicao, "Frequências observadas")
-    exibir_frequencias_linha(freq_esperada, "Frequências esperadas")
-
-    letra_mais_freq = alfabeto[freq_posicao.index(max(freq_posicao))]
-    if idioma == 'en':
-        sugestao = alfabeto[(alfabeto.index(letra_mais_freq) - alfabeto.index('e')) % 26]
-    else:
-        sugestao = alfabeto[(alfabeto.index(letra_mais_freq) - alfabeto.index('a')) % 26]
-    print(f"Sugestão: '{letra_mais_freq.upper()}' -> '{sugestao.upper()}'")
-
-    while True:
-        letra_chave = input(f"Letra para posição {posicao + 1} (Enter = '{sugestao.upper()}'): ").upper()
-        if letra_chave == "":
-            letra_chave = sugestao.upper()
-        if letra_chave.lower() not in alfabeto:
-            print("Letra inválida.")
+    for posicao in range(fator_escolhido):
+        grupo = grupos[posicao]
+        if not grupo:
             continue
-        deslocamento = alfabeto.index(letra_chave.lower())
-        freq_deslocada = deslocar_frequencias(freq_posicao, deslocamento)
-        exibir_frequencias_linha(freq_deslocada, f"Frequências com '{letra_chave}'")
-        confirmar = input("Confirmar? (S): ").upper()
-        if confirmar == "S":
-            chave_descoberta[posicao] = letra_chave.upper()
-            break
 
-print(f"\nCHAVE FINAL: {''.join(chave_descoberta)}")
-texto_decifrado = decifrar_vigenere(cifra, ''.join(chave_descoberta).lower())
-print("\n=== TEXTO DECIFRADO ===\n")
-print(texto_decifrado)
+        print(f"\nPOSIÇÃO {posicao + 1} DA CHAVE")
+        freq_posicao = calcular_frequencia_letras(grupo)
+        exibir_frequencias_linha(freq_posicao, "Frequências observadas")
+        exibir_frequencias_linha(freq_esperada, "Frequências esperadas")
+
+        letra_mais_freq = alfabeto[freq_posicao.index(max(freq_posicao))]
+        letra_referencia = 'e' if idioma == 'en' else 'a'
+        sugestao = alfabeto[(alfabeto.index(letra_mais_freq) - alfabeto.index(letra_referencia)) % 26]
+        print(f"Sugestão: '{letra_mais_freq.upper()}' -> '{sugestao.upper()}'")
+
+        while True:
+            letra_chave = input(f"Letra para posição {posicao + 1} (Enter = '{sugestao.upper()}'): ").upper()
+            if letra_chave == "":
+                letra_chave = sugestao.upper()
+            if letra_chave.lower() not in alfabeto:
+                print("Letra inválida.")
+                continue
+            deslocamento = alfabeto.index(letra_chave.lower())
+            freq_deslocada = deslocar_frequencias(freq_posicao, deslocamento)
+            exibir_frequencias_linha(freq_deslocada, f"Frequências com '{letra_chave}'")
+            confirmar = input("Confirmar? (S): ").upper()
+            if confirmar == "S":
+                chave_descoberta[posicao] = letra_chave.upper()
+                break
+
+    print(f"\nCHAVE FINAL ({idioma.upper()}): {''.join(chave_descoberta)}")
+    texto_decifrado = decifrar_vigenere(cifra, ''.join(chave_descoberta).lower())
+    print("\n=== TEXTO DECIFRADO ===\n")
+    print(texto_decifrado)
+
+
+# === EXECUÇÃO AUTOMÁTICA EM SEQUÊNCIA: PT -> EN ===
+processar_texto(plaintext_portugues, chave_pt, frequencia_portugues, 'pt')
+processar_texto(plaintext_ingles, chave_en, frequencia_ingles, 'en')
