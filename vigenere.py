@@ -2,8 +2,8 @@ import re
 import unicodedata
 
 alfabeto = "abcdefghijklmnopqrstuvwxyz"
-chave_pt = "chave"
-chave_en = "keyst"
+chave_pt = "chavesoi"
+chave_en = "keys"
 plaintext_portugues = """
 A segurança computacional é uma disciplina essencial dentro da tecnologia da informação, cuja função principal é proteger sistemas, redes, programas e dados contra ameaças internas e externas que possam comprometer sua integridade, confidencialidade e disponibilidade. Em um mundo cada vez mais digitalizado, onde transações bancárias, comunicações pessoais, registros médicos, operações empresariais e decisões governamentais dependem fortemente de sistemas informatizados, a segurança computacional tornou-se um pilar indispensável para o funcionamento seguro e eficiente da sociedade moderna.
 
