@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Sistema de Geração e Verificação de Assinaturas RSA
-Implementa geração de chaves, OAEP, assinatura e verificação usando SHA-3
-"""
 
 import hashlib
 import os
